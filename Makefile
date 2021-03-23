@@ -28,7 +28,7 @@ all: libyu examples
 
 clean:
 	-rm -rf $(OBJ_DIR)
-	-rm $(LIB_TARGET)
+	-rm -f $(LIB_TARGET)
 	-rm -rf $(EXAMPLES_BIN_DIR)
 
 libyu: $(LIB_TARGET)
