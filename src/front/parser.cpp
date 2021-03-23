@@ -226,8 +226,13 @@ ASTPtr Parser::ParseEnum(Property prop) {
   return MakeAST<EnumAST>(log, prop, id, std::move(type), std::move(defs));
 }
 
-ASTPtr Parser::ParseImport() {
+ASTPtr Parser::ParseImport(Property prop) {
   auto log = logger();
+  // check property
+  if (prop == Property::Extern || prop == Property::Inline) {
+    log.LogWarning("importations cannot be 'extern' "
+                   "or 'inline', try using 'public'");
+  }
   NextToken();
   // get module name
   ModName mod_name;
@@ -366,11 +371,13 @@ ASTPtr Parser::ParseBlockLine() {
 }
 
 ASTPtr Parser::ParseBlockStatement() {
-  // get normal statement
-  if (!IsTokenKeyword(Keyword::Def)) {
-    auto stmt = GetStatement(Property::None);
-    if (stmt) return stmt;
+  // check if is invalid statement
+  if (IsTokenKeyword(Keyword::Def) || IsTokenKeyword(Keyword::Import)) {
+    return LogError("invalid in-block statement");
   }
+  // get normal statement
+  auto stmt = GetStatement(Property::None);
+  if (stmt) return stmt;
   // parse other in-block statements
   if (cur_token_ == Token::Keyword) {
     switch (lexer()->key_val()) {
@@ -872,9 +879,10 @@ ASTPtr Parser::ParseValType() {
 ASTPtr Parser::ParsePrimType() {
   switch (lexer()->key_val()) {
     case Keyword::Int8: case Keyword::Int16: case Keyword::Int32:
-    case Keyword::Int64: case Keyword::UInt8: case Keyword::UInt16:
-    case Keyword::UInt32: case Keyword::UInt64: case Keyword::Float32:
-    case Keyword::Float64: case Keyword::Bool: break;
+    case Keyword::Int64: case Keyword::ISize: case Keyword::UInt8:
+    case Keyword::UInt16: case Keyword::UInt32: case Keyword::UInt64:
+    case Keyword::USize: case Keyword::Float32: case Keyword::Float64:
+    case Keyword::Bool: break;
     default: return LogError("expected primitive type keywords");
   }
   auto ast = MakeAST<PrimTypeAST>(lexer()->key_val());
@@ -986,7 +994,7 @@ ASTPtr Parser::GetStatement(Property prop) {
     case Keyword::Type: return ParseTypeAlias(prop);
     case Keyword::Struct: return ParseStruct(prop);
     case Keyword::Enum: return ParseEnum(prop);
-    case Keyword::Import: return ParseImport();
+    case Keyword::Import: return ParseImport(prop);
     default: return nullptr;
   }
 }

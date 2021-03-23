@@ -151,6 +151,8 @@ TypePtr Analyzer::AnalyzeOn(VarLetDefAST &ast) {
   last_prop_ = ast.prop();
   for (const auto &i : ast.defs()) {
     if (!i->SemaAnalyze(*this)) return nullptr;
+    // run evaluation on var/let definitions for constant definitions
+    i->Eval(eval_);
   }
   return ast.set_ast_type(MakeVoid());
 }
@@ -357,9 +359,14 @@ TypePtr Analyzer::AnalyzeOn(VarLetElemAST &ast) {
     assert(!type->IsRightValue());
     if (init && !CheckInit(log, type, init, id)) return nullptr;
     // check for reference types
-    if (!init && type->IsReference()) {
-      return LogError(log, "cannot define a reference "
-                      "without initialization", id);
+    if (type->IsReference()) {
+      if (!init) {
+        return LogError(log, "cannot define a reference "
+                        "without initialization", id);
+      }
+      if (ast.is_var()) {
+        log.LogWarning("references should only be defined with 'let'");
+      }
     }
     sym_type = std::move(type);
   }
@@ -375,11 +382,13 @@ TypePtr Analyzer::AnalyzeOn(VarLetElemAST &ast) {
     sym_type = std::move(init);
   }
   // add symbol info
-  if (ast.is_var()) {
-    if (sym_type->IsConst()) sym_type = sym_type->GetDeconstedType();
-  }
-  else if (!sym_type->IsConst()) {
-    sym_type = std::make_shared<ConstType>(std::move(sym_type));
+  if (!sym_type->IsReference()) {
+    if (ast.is_var()) {
+      if (sym_type->IsConst()) sym_type = sym_type->GetDeconstedType();
+    }
+    else if (!sym_type->IsConst()) {
+      sym_type = std::make_shared<ConstType>(std::move(sym_type));
+    }
   }
   symbols_->AddItem(id, sym_type);
   ast.set_ast_type(std::move(sym_type));
@@ -789,7 +798,7 @@ TypePtr Analyzer::AnalyzeOn(UnaryAST &ast) {
       break;
     }
     case UnaryOp::SizeOf: {
-      ret = MakePrimType(Keyword::UInt32, true);
+      ret = MakePrimType(Keyword::USize, true);
       break;
     }
     default: assert(false); return nullptr;

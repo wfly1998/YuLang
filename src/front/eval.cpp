@@ -226,7 +226,8 @@ std::optional<EvalNum> Evaluator::EvalOn(EnumAST &ast) {
 }
 
 std::optional<EvalNum> Evaluator::EvalOn(ImportAST &ast) {
-  for (const auto &i : ast.defs()) i->Eval(*this);
+  // do nothing, since imported ASTs are evaluated
+  // in Analyzer::AnalyzeOn(ImportAST &)
   return {};
 }
 
@@ -561,8 +562,8 @@ std::optional<EvalNum> Evaluator::EvalOn(FunCallAST &ast) {
 }
 
 std::optional<EvalNum> Evaluator::EvalOn(IntAST &ast) {
-  auto i32 = static_cast<std::int32_t>(ast.value());
-  return static_cast<std::uint64_t>(i32);
+  // NOTE: integer literals can represent integers wider than 32-bit
+  return ast.value();
 }
 
 std::optional<EvalNum> Evaluator::EvalOn(FloatAST &ast) {

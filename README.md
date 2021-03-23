@@ -3,8 +3,15 @@
 ![YuLang](YuLang.png)
 
 [![Build and Test](https://github.com/MaxXSoft/YuLang/workflows/Build%20and%20Test/badge.svg)](https://github.com/MaxXSoft/YuLang)
+[![羽语言简明教程](https://img.shields.io/badge/tutorial-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-blue)](https://maxxsoft.github.io/YuLang-doc/tutorial/zh-cn/)
 
 Yu (羽) is a simple system programming language.
+
+## Documentations
+
+* Tutorial: [简体中文版 (GitHub)](https://maxxsoft.github.io/YuLang-doc/tutorial/zh-cn/), [简体中文版 (Gitee)](https://maxxsoft.gitee.io/yulang-doc/tutorial/zh-cn/).
+
+Visit [YuLang-doc](https://github.com/MaxXSoft/YuLang-doc) for more details.
 
 ## Features
 
@@ -120,8 +127,8 @@ enum_list ::= id ["=" expr] ["," enum_list] [","];
 block     ::= "{" {blk_line} "}";
 blk_line  ::= blk_stmt {";" blk_stmt} [";"];
 blk_stmt  ::= var_def | let_def | declare | ty_alias  | struct
-            | enum    | import  | if_else | when      | while
-            | for_in  | asm     | control | expr;
+            | enum    | if_else | when    | while     | for_in
+            | asm     | control | expr;
 
 if_else   ::= "if" expr block ["else" (if_else | block)];
 when      ::= "when" expr "{" when_elem {when_elem} ["else" block] "}";
@@ -158,8 +165,8 @@ null_ptr  ::= "null";
 val_init  ::= "[" type "]" "{" [expr {"," expr} [","]] "}";
 
 type      ::= (prim_type | id | pointer | array | ref | func) ["volatile"];
-prim_type ::= "i8"  | "i16" | "i32" | "i64" | "u8"  | "u16"
-            | "u32" | "u64" | "f32" | "f64" | "bool";
+prim_type ::= "i8"  | "i16" | "i32"   | "i64" | "isize" | "u8"  | "u16"
+            | "u32" | "u64" | "usize" | "f32" | "f64" | "bool";
 pointer   ::= type ["var"] "*";
 array     ::= type "[" expr "]";
 ref       ::= type ["var"] "&";
