@@ -86,7 +86,7 @@ extern def main(argc: i32, argv: u8**): i32 {
 Before building YuLang compiler, please make sure you have installed the following dependencies:
 
 * `cmake` 3.13 or later
-* `llvm` 8.0 ~ 10.0.1
+* `llvm` 8.0 or later
 * `clang`
 
 You can build this repository by executing the following command lines:
@@ -180,3 +180,4 @@ See [CHANGELOG.md](CHANGELOG.md)
 ## License
 
 Copyright (C) 2010-2020 MaxXing. License GPLv3.
+
