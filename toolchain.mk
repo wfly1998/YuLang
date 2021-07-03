@@ -19,11 +19,11 @@ export YUC_BIN := $(BUILD_DIR)/yuc
 export YUC := $(YUC_BIN) $(YUFLAGS)
 
 # LLVM compiler
-LLCFLAGS := $(C_OPT_ARG) -filetype=obj
+LLCFLAGS := $(C_OPT_ARG) --filetype=obj
 export LLC := llc $(LLCFLAGS)
 
 # linker
-LDFLAGS :=
+LDFLAGS := -no-pie
 export LD := clang $(LDFLAGS)
 
 # archiver
